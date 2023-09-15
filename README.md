@@ -42,7 +42,7 @@ roles
 
 issue credential
 ```
-curl http://localhost:8002/issue-credential-1
+curl http://localhost:8002/issue-credential/1
 curl http://localhost:8002/credentials
 curl http://localhost:8002/connections
 curl http://localhost:8003/connections
