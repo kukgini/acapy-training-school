@@ -1,0 +1,44 @@
+diff --git a/aries_cloudagent/core/dispatcher.py b/aries_cloudagent/core/dispatcher.py
+index c1a176dd4..e3dbd1213 100644
+--- a/aries_cloudagent/core/dispatcher.py
++++ b/aries_cloudagent/core/dispatcher.py
+@@ -237,7 +237,7 @@ class Dispatcher:
+         # When processing oob attach message we supply the connection id
+         # associated with the inbound message
+         if inbound_message.connection_id:
+-            async with self.profile.session() as session:
++            async with profile.session() as session:
+                 connection = await ConnRecord.retrieve_by_id(
+                     session, inbound_message.connection_id
+                 )
+diff --git a/aries_cloudagent/protocols/out_of_band/v1_0/manager.py b/aries_cloudagent/protocols/out_of_band/v1_0/manager.py
+index 4cf530a0e..3cebf44f7 100644
+--- a/aries_cloudagent/protocols/out_of_band/v1_0/manager.py
++++ b/aries_cloudagent/protocols/out_of_band/v1_0/manager.py
+@@ -663,7 +663,7 @@ class OutOfBandManager(BaseConnectionManager):
+                 return oob_record
+ 
+     async def _wait_for_conn_rec_active(
+-        self, connection_id: str, timeout: int = 7
++        self, connection_id: str, timeout: int = 2
+     ) -> Optional[ConnRecord]:
+         CONNECTION_READY_EVENT = re.compile(
+             "^acapy::record::connections::(active|completed|response)$"
+@@ -700,8 +700,15 @@ class OutOfBandManager(BaseConnectionManager):
+             )
+ 
+         except asyncio.TimeoutError:
+-            LOGGER.warning(f"Connection for connection_id {connection_id} not ready")
+-            return None
++            async with self.profile.session() as session:
++                conn_record = await ConnRecord.retrieve_by_id(
++                    session, connection_id
++                )
++            if conn_record.is_ready:
++                return conn_record
++            else:
++                LOGGER.warning(f"Connection for connection_id {connection_id} not ready")
++                return None
+ 
+     async def _handle_hanshake_reuse(
+         self, oob_record: OobRecord, conn_record: ConnRecord, version: str

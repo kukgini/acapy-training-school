@@ -1,0 +1,163 @@
+version: '3.5'
+
+volumes:
+  postgres-data:
+  acapy-storage:
+  tails-files:
+
+services:
+  postgres:
+    image: postgres:14
+    platform: linux/amd64
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  tails:
+    build:
+      context: ./tails
+    platform: linux/amd64
+    ports:
+      - 8080:8080
+    volumes:
+      - tails-files:/home/indy/tails-files
+    entrypoint: [
+      "tails-server", "--host", "0.0.0.0", "--port", "80", "--storage-path", "/home/indy/tails-files"
+    ]
+  acapy:
+    build:
+      context: ./acapy
+    platform: linux/amd64
+    ports:
+      - 8001:8001
+    volumes:
+      - acapy-storage:/home/indy/.indy_client
+    entrypoint: [ 
+      "aca-py", "start", 
+      "--admin", "0.0.0.0", "8001",
+      "--endpoint", "http://acapy:8000",
+      "--inbound-transport", "http", "0.0.0.0", "8000",
+      "--outbound-transport", "http",
+      "--auto-respond-credential-request",
+      "--auto-verify-presentation",
+    ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://acapy:8001/status/ready"]
+        interval: 1m
+        timeout: 10s
+        retries: 3
+        start_period: 10s
+    environment:
+      RUST_LOG: "debug"
+      ACAPY_LOG_LEVEL: "debug"
+      
+      ACAPY_MULTITENANT: "true"
+      ACAPY_MULTITENANT_ADMIN: "true"
+      ACAPY_MULTITENANT_JWT_SECRET: "EKLKNBj4JasyVTuEWdyYjFis8ELBquuEErSHSB4DNWm2"
+      ACAPY_MULTITENANCY_CONFIGURATION: |+
+          {
+            "wallet_type":"askar-profile",
+            "wallet_name":"tenancy_wallets",
+            "cache_size":"100",
+            "key_derivation_method":"RAW"
+          }
+          
+      ACAPY_WALLET_ALLOW_INSECURE_SEED: "true"
+      ACAPY_WALLET_TYPE: "askar"
+      ACAPY_WALLET_NAME: "base_wallet"
+      ACAPY_WALLET_KEY_DERIVATION_METHOD: "RAW"
+      ACAPY_WALLET_KEY: "AgRVxFCXpuDS8NhYxamb8BkMDZr8NZzX9Y2Ut3ek6pRo"
+      ACAPY_WALLET_STORAGE_TYPE: "postgres_storage"
+      ACAPY_WALLET_STORAGE_CONFIG: |+
+          {
+            "url":"postgres:5432",
+            "wallet_scheme":"MultiWalletSingleTable",
+            "max_connections":"5",
+            "min_idle_count":"0",
+            "connection_timeout":"5"
+          }
+      ACAPY_WALLET_STORAGE_CREDS: |+
+        {
+          "account":"postgres",
+          "password":"mysecretpassword",
+          "admin_account":"postgres",
+          "admin_password":"mysecretpassword"
+        }
+
+      ACAPY_ADMIN_INSECURE_MODE: "true"
+      ACAPY_IMAGE_URL: "https://robohash.org/acapy"
+      ACAPY_ADMIN_CLIENT_MAX_REQUEST_SIZE: "16"
+      ACAPY_MAX_MESSAGE_SIZE: "16777216"
+      ACAPY_MAX_OUTBOUND_RETRY: 1
+
+      ACAPY_PUBLIC_INVITES: "true"
+
+      ACAPY_AUTO_PROVISION: "true"
+      ACAPY_AUTO_ACCEPT_REQUESTS: "true"
+      ACAPY_AUTO_RESPOND_CREDENTIAL_OFFER: "true"
+      ACAPY_AUTO_STORE_CREDENTIAL: "true"
+      ACAPY_AUTO_RESPOND_PRESENTATION_REQUEST: "true"
+
+      ACAPY_GENESIS_TRANSACTIONS: |+
+        {"reqSignature":{},"txn":{"data":{"data":{"alias":"Node1","blskey":"4N8aUNHSgjQVgkpm8nhNEfDf6txHznoYREg9kirmJrkivgL4oSEimFF6nsQ6M41QvhM2Z33nves5vfSn9n1UwNFJBYtWVnHYMATn76vLuL3zU88KyeAYcHfsih3He6UHcXDxcaecHVz6jhCYz1P2UZn2bDVruL5wXpehgBfBaLKm3Ba","blskey_pop":"RahHYiCvoNCtPTrVtP7nMC5eTYrsUA8WjXbdhNc8debh1agE9bGiJxWBXYNFbnJXoXhWFMvyqhqhRoq737YQemH5ik9oL7R4NTTCz2LEZhkgLJzB3QRQqJyBNyv7acbdHrAT8nQ9UkLbaVL9NBpnWXBTw4LEMePaSHEw66RzPNdAX1","client_ip":"138.197.138.255","client_port":9702,"node_ip":"138.197.138.255","node_port":9701,"services":["VALIDATOR"]},"dest":"Gw6pDLhcBcoQesN72qfotTgFa7cbuqZpkX3Xo6pLhPhv"},"metadata":{"from":"Th7MpTaRZVRYnPiabds81Y"},"type":"0"},"txnMetadata":{"seqNo":1,"txnId":"fea82e10e894419fe2bea7d96296a6d46f50f93f9eeda954ec461b2ed2950b62"},"ver":"1"}
+        {"reqSignature":{},"txn":{"data":{"data":{"alias":"Node2","blskey":"37rAPpXVoxzKhz7d9gkUe52XuXryuLXoM6P6LbWDB7LSbG62Lsb33sfG7zqS8TK1MXwuCHj1FKNzVpsnafmqLG1vXN88rt38mNFs9TENzm4QHdBzsvCuoBnPH7rpYYDo9DZNJePaDvRvqJKByCabubJz3XXKbEeshzpz4Ma5QYpJqjk","blskey_pop":"Qr658mWZ2YC8JXGXwMDQTzuZCWF7NK9EwxphGmcBvCh6ybUuLxbG65nsX4JvD4SPNtkJ2w9ug1yLTj6fgmuDg41TgECXjLCij3RMsV8CwewBVgVN67wsA45DFWvqvLtu4rjNnE9JbdFTc1Z4WCPA3Xan44K1HoHAq9EVeaRYs8zoF5","client_ip":"138.197.138.255","client_port":9704,"node_ip":"138.197.138.255","node_port":9703,"services":["VALIDATOR"]},"dest":"8ECVSk179mjsjKRLWiQtssMLgp6EPhWXtaYyStWPSGAb"},"metadata":{"from":"EbP4aYNeTHL6q385GuVpRV"},"type":"0"},"txnMetadata":{"seqNo":2,"txnId":"1ac8aece2a18ced660fef8694b61aac3af08ba875ce3026a160acbc3a3af35fc"},"ver":"1"}
+        {"reqSignature":{},"txn":{"data":{"data":{"alias":"Node3","blskey":"3WFpdbg7C5cnLYZwFZevJqhubkFALBfCBBok15GdrKMUhUjGsk3jV6QKj6MZgEubF7oqCafxNdkm7eswgA4sdKTRc82tLGzZBd6vNqU8dupzup6uYUf32KTHTPQbuUM8Yk4QFXjEf2Usu2TJcNkdgpyeUSX42u5LqdDDpNSWUK5deC5","blskey_pop":"QwDeb2CkNSx6r8QC8vGQK3GRv7Yndn84TGNijX8YXHPiagXajyfTjoR87rXUu4G4QLk2cF8NNyqWiYMus1623dELWwx57rLCFqGh7N4ZRbGDRP4fnVcaKg1BcUxQ866Ven4gw8y4N56S5HzxXNBZtLYmhGHvDtk6PFkFwCvxYrNYjh","client_ip":"138.197.138.255","client_port":9706,"node_ip":"138.197.138.255","node_port":9705,"services":["VALIDATOR"]},"dest":"DKVxG2fXXTU8yT5N7hGEbXB3dfdAnYv1JczDUHpmDxya"},"metadata":{"from":"4cU41vWW82ArfxJxHkzXPG"},"type":"0"},"txnMetadata":{"seqNo":3,"txnId":"7e9f355dffa78ed24668f0e0e369fd8c224076571c51e2ea8be5f26479edebe4"},"ver":"1"}
+        {"reqSignature":{},"txn":{"data":{"data":{"alias":"Node4","blskey":"2zN3bHM1m4rLz54MJHYSwvqzPchYp8jkHswveCLAEJVcX6Mm1wHQD1SkPYMzUDTZvWvhuE6VNAkK3KxVeEmsanSmvjVkReDeBEMxeDaayjcZjFGPydyey1qxBHmTvAnBKoPydvuTAqx5f7YNNRAdeLmUi99gERUU7TD8KfAa6MpQ9bw","blskey_pop":"RPLagxaR5xdimFzwmzYnz4ZhWtYQEj8iR5ZU53T2gitPCyCHQneUn2Huc4oeLd2B2HzkGnjAff4hWTJT6C7qHYB1Mv2wU5iHHGFWkhnTX9WsEAbunJCV2qcaXScKj4tTfvdDKfLiVuU2av6hbsMztirRze7LvYBkRHV3tGwyCptsrP","client_ip":"138.197.138.255","client_port":9708,"node_ip":"138.197.138.255","node_port":9707,"services":["VALIDATOR"]},"dest":"4PS3EDQ3dW1tci1Bp6543CfuuebjFrg36kLAUcskGfaA"},"metadata":{"from":"TWwCRQRZ2ZHMJFn9TzLp7W"},"type":"0"},"txnMetadata":{"seqNo":4,"txnId":"aa5e817d7cc626170eca175822029339a444eb0ee8f0bd20d3b0b76e566fb008"},"ver":"1"}
+
+      ACAPY_TAILS_SERVER_BASE_URL: "http://tails"
+      ACAPY_TAILS_SERVER_UPLOAD_URL: "http://tails"
+  holder-controller:
+    build:
+      context: ./controller
+    platform: linux/amd64
+    ports:
+      - 8002:80
+    volumes:
+      - ./holder-controller/src:/app/src
+    entrypoint: [
+       "python3", "src/main.py"
+    ]
+    environment:
+      ACAPY_WALLET_TOKEN: "${HOLDER_WALLET_TOKEN}"
+      ACAPY_ADMIN_URL: "http://acapy:8001"
+      ISSUER_ENDPOINT: "http://issuer-controller:80"
+      VERIFIER_ENDPOINT: "http://verifier-controller:80"
+  issuer-controller:
+    build:
+      context: ./controller
+    platform: linux/amd64
+    ports:
+      - 8003:80
+    volumes:
+      - ./issuer-controller/src:/app/src
+    entrypoint: [
+       "python3", "src/main.py"
+    ]
+    environment:
+      ACAPY_WALLET_TOKEN: "${ISSUER_WALLET_TOKEN}"
+      ACAPY_ADMIN_URL: "http://acapy:8001"
+      CRED_DEF_ID_1: "${CRED_DEF_ID_1}"
+  verifier-controller:
+    build:
+      context: ./controller
+    platform: linux/amd64
+    ports:
+      - 8004:80
+    volumes:
+      - ./verifier-controller/src:/app/src
+    entrypoint: [
+       "python3", "src/main.py"
+    ]
+    environment:
+      ACAPY_WALLET_TOKEN: "${VERIFIER_WALLET_TOKEN}"
+      ACAPY_ADMIN_URL: "http://acapy:8001"
+      CRED_DEF_ID_1: "${CRED_DEF_ID_1}"
