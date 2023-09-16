@@ -42,15 +42,24 @@ roles
 
 issue credential
 ```
+# this will issue a credential through oob with attachment
 curl http://localhost:8002/issue-credential/1
 curl http://localhost:8002/credentials
 curl http://localhost:8002/connections
+
+# in issuer side, there will be a connection with holder.
+# this connection can be reused because it has public DID in further usecases.
 curl http://localhost:8003/connections
 ```
 
 present proof
 ```
+# this will present a proof through connection-less present proof
 curl http://localhost:8002/present-proof/1
+
+# verifier has no connection because it was connection-less
+# verifier got a present-proof record
+curl http://localhost:8004/connections
 curl http://localhost:8004/present-proof/records
 ```
 
