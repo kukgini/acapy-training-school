@@ -62,8 +62,8 @@ present proof
 # this will present a proof through connection-less present proof
 curl http://localhost:8002/present-proof/1
 
-# verifier has no connection because it was connection-less
-# verifier got a present-proof record
+# verifier has no connection because it was connection-less present proof
+# while verifier got a present-proof record.
 curl http://localhost:8004/connections
 curl http://localhost:8004/present-proof/records
 ```
