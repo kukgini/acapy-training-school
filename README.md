@@ -26,6 +26,8 @@ docker-compose up postgres tails acapy -d
 
 run setup.py
 ```bash
+# this will setup 3 tenant (issuer / holder / verifier) in multi-tenancy acapy
+# and for the issuer, issuer public DID, schema and cred_def also setup. 
 python3 setpy.py
 ```
 
@@ -42,7 +44,10 @@ roles
 
 issue credential
 ```bash
-# this will issue a credential through oob with attachment
+# this will issue a credential through oob with attachment.
+# nomally, holder should be received oob invitation in other ways.
+# for example, holder could receives oob invitation from qr code.
+# anyway, this is a simple demonstration of the whole flow.
 curl http://localhost:8002/issue-credential/1
 curl http://localhost:8002/credentials
 curl http://localhost:8002/connections
