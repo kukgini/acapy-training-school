@@ -1,48 +1,68 @@
-setup guide
+Although there is a demo project provided in aries-cloudagent-python, it was not easy for me to understand the relationship between the agent and agent controller for the actual service. Therefore, I made this practice environment for educational / excercise purposes. Hopefully, this repository will be helpful to beginners, especially in the context of multitenancy.
 
-register an endorser DID with seed on test.bcovin.vonx.io
+# setup guide
 
-copy env.template to .env
+## register an endorser DID
+
+register an endorser DID with seed on test.bcovin.vonx.io and remember that seed.
+
+## setup environment variables
+
+Copy env.template to .env
 ```bash
 cp env.template .env
 ```
 
-edit .env
+Edit .env
 ```bash
 vi .env
 ```
+You need only two options to edit.
 * ISSUER_PUBLIC_DID_SEED='seed for a endorser that already registered above'
 * SCHEMA_VERSION='whatever you want in semver format'
 
-build docker images
+# build docker images
+
 ```bash
 docker-compose build
 ```
 
-run containers
+# run containers
+
 ```bash
 docker-compose up postgres tails acapy -d
 ```
 
-run setup.py
+# run setup.py
+
 ```bash
 # this will setup 3 tenant (issuer / holder / verifier) in multi-tenancy acapy
 # and for the issuer, issuer public DID, schema and cred_def also setup. 
 python3 setpy.py
 ```
 
-stop containers and re-run
+this will fill remaining .env variables automatically.
+
+# stop containers and re-run
+
 ```bash
 docker-compose down
 docker-compose up -d
 ```
 
-roles
-* port 8002 holder
-* port 8003 issuer
-* port 8004 verifier
+practice environment is ready now.
 
-issue credential
+# how to use
+
+## roles
+
+* port 8001 multitenant agent service
+* port 8002 holder agent controller
+* port 8003 issuer agent controller
+* port 8004 verifier agent controller
+
+## issue credential
+
 ```bash
 # this will issue a credential through oob with attachment.
 # nomally, holder should be received oob invitation in other ways.
@@ -57,7 +77,8 @@ curl http://localhost:8002/connections
 curl http://localhost:8003/connections
 ```
 
-present proof
+## present proof
+
 ```bash
 # this will present a proof through connection-less present proof
 curl http://localhost:8002/present-proof/1
