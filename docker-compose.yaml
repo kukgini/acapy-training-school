@@ -35,6 +35,7 @@ services:
       context: ./acapy
     platform: linux/amd64
     ports:
+      - 8000:8000
       - 8001:8001
     volumes:
       - acapy-storage:/home/indy/.indy_client

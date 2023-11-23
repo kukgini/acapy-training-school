@@ -88,7 +88,7 @@ def create_oob_invitation(type, id):
         'alias': 'Issuer',
         'handshake_protocols': ['did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/connections/1.0'],
         'protocol_version': '1.1',
-        'use_public_did': True,
+        'use_public_did': False,
     }
     if id:
         url = f'{acapy_admin_url}/out-of-band/create-invitation?auto_accept=true&multi_use=false'
