@@ -26,7 +26,12 @@ docker-compose up postgres tails acapy -d
 
 run setup.py
 ```
-python3 setpy.py
+python3 -m venv venv
+source venv/bin/activate
+pip3 install requests python-dotenv
+python3 setup.py
+deactivate
+rn -rf venv
 ```
 
 stop containers and re-run
@@ -42,7 +47,7 @@ roles
 
 issue credential
 ```
-curl http://localhost:8002/issue-credential-1
+curl http://localhost:8002/issue-credential/1
 curl http://localhost:8002/credentials
 curl http://localhost:8002/connections
 curl http://localhost:8003/connections

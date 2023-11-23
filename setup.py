@@ -167,14 +167,14 @@ if __name__ == '__main__':
     os.environ["SCHEMA_ID_1"] = schema_id_1
     dotenv.set_key(dotenv_file, "SCHEMA_ID_1", os.environ["SCHEMA_ID_1"])
 
-    # SETUP issuer step 5, create credential definition. (non revoc)
+    # SETUP issuer step 5, create non revocable credential definition.
     schema_id_1 = os.environ["SCHEMA_ID_1"]
     cred_def_1_non_revoc = create_credential_definition_non_revoc(issuer_token, schema_id_1)
     os.environ["CRED_DEF_ID_1_NON_REVOC"] = cred_def_1_non_revoc
     dotenv.set_key(dotenv_file, "CRED_DEF_ID_1_NON_REVOC", os.environ["CRED_DEF_ID_1_NON_REVOC"])
 
-    # SETUP issuer step 5, create credential definition. (revocable)
+    # SETUP issuer step 5, create revicable credential definition. (default issue type)
     cred_def_1_revocable1k = create_credential_definition_1_revocable_1k(issuer_token, schema_id_1)
     os.environ["CRED_DEF_ID_1_REVOCABLE_1K"] = cred_def_1_revocable1k
     dotenv.set_key(dotenv_file, "CRED_DEF_ID_1_REVOCABLE_1K", os.environ["CRED_DEF_ID_1_REVOCABLE_1K"])
-    dotenv.set_key(dotenv_file, "CRED_DEF_ID_1", os.environ["CRED_DEF_ID_1"])
+    dotenv.set_key(dotenv_file, "CRED_DEF_ID_1", os.environ["CRED_DEF_ID_1_REVOCABLE_1K"])
