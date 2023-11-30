@@ -75,6 +75,7 @@ def create_oob_invitation(alias, type, id):
         'accept': ['didcomm/aip1','didcomm/aip2'],
         'protocol_version': '1.1',
         'alias': alias,
+        'handshake_protocols': [ 'https://didcomm.org/connections/1.0' ]
     }
     if id:
         data['attachments'] = [{'type': type, 'id': id}]
