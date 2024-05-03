@@ -27,7 +27,7 @@ You need only two options to edit.
 docker-compose build
 ```
 
-# run containers
+# run base containers
 
 ```bash
 docker-compose up postgres tails acapy -d
@@ -38,20 +38,23 @@ docker-compose up postgres tails acapy -d
 ```bash
 # this will setup 3 tenant (issuer / holder / verifier) in multi-tenancy acapy
 # and for the issuer, issuer public DID, schema and cred_def also setup. 
+
+# prepare python environment to run setup
 python3 -m venv venv
 source venv/bin/activate
 pip3 install requests python-dotenv
+
+# run setup. this will fill in remaining .env variables.
 python3 setup.py
+
+# clean up python environment
 deactivate
 rm -rf venv
 ```
 
-this will fill remaining .env variables automatically.
-
-# stop containers and re-run
+# run remain containers
 
 ```bash
-docker-compose down
 docker-compose up -d
 ```
 
@@ -59,9 +62,10 @@ practice environment is ready now.
 
 # how to use
 
-## roles
+## ports explained
 
-* port 8001 multitenant agent service
+* port 8000 multi tenent agency itself
+* port 8001 multi tenant controller api service
 * port 8002 holder agent controller
 * port 8003 issuer agent controller
 * port 8004 verifier agent controller
@@ -72,14 +76,18 @@ practice environment is ready now.
 # this will issue a credential through oob with attachment.
 # nomally, holder should be received oob invitation in other ways.
 # for example, holder could receives oob invitation from qr code.
-# anyway, this is a simple demonstration of the whole flow.
+# anyway, this is a simple demonstration of the issuance flow.
 
+# this api will receive and accept a oob invitation from issuer.
+# credential offer is attached in that invitation.
+# being process that invitation, holder receives a credential from issuer. 
 curl http://localhost:8002/issue-credential/1
 curl http://localhost:8002/credentials
 curl http://localhost:8002/connections
 
-# in issuer side, there will be a connection with holder.
-# this connection can be reused because it has public DID in further usecases.
+# in issuer side, there is a credential exchange record with no connection.
+# this is because isser made a oob invitation without handshake_protocols.
+curl http://localhost:8003/credential-exchange/records
 curl http://localhost:8003/connections
 ```
 
@@ -87,12 +95,16 @@ curl http://localhost:8003/connections
 
 ```bash
 # this will present a proof through connection-less present proof
+
+# this api will receive and accept a oob invitation from verifier.
+# presentation request is attached in that invitation.
+# holder build a proof of that request and send it to verifier.
 curl http://localhost:8002/present-proof/1
 
 # verifier has no connection because it was connection-less present proof
 # while verifier got a present-proof record.
+curl http://localhost:8004/proof-exchange/records
 curl http://localhost:8004/connections
-curl http://localhost:8004/present-proof/records
 ```
 
 cleanup all

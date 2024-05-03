@@ -78,15 +78,17 @@ def get_connections():
 
     results = []
     for conn in j["results"]:
-        results.append(conn["connection_id"])
+        result = f'id={conn["connection_id"]}, state={conn["state"]}'
+        results.append(result)
+
     
     return json.dumps(results)
 
 def create_oob_invitation(type, id):    
     data = {
-        'accept': ['didcomm/aip1','didcomm/aip2'],
+        'accept': ['didcomm/aip2'],
         'alias': 'Issuer',
-        'handshake_protocols': ['did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/connections/1.0'],
+        'handshake_protocols': [],
         'protocol_version': '1.1',
         'use_public_did': False,
     }

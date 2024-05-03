@@ -48,7 +48,8 @@ def get_connections():
 
     results = []
     for conn in j["results"]:
-        results.append(conn["connection_id"])
+        result = f'id={conn["connection_id"]}, state={conn["state"]}'
+        results.append(result)
     
     return json.dumps(results)
 
@@ -72,10 +73,10 @@ def get_present_proof_records():
 def create_oob_invitation(alias, type, id):    
     url = f'{acapy_admin_url}/out-of-band/create-invitation?auto_accept=true'
     data = {
-        'accept': ['didcomm/aip1','didcomm/aip2'],
+        'accept': ['didcomm/aip2'],
         'protocol_version': '1.1',
         'alias': alias,
-        'handshake_protocols': [ 'https://didcomm.org/connections/1.0' ]
+        'handshake_protocols': []
     }
     if id:
         data['attachments'] = [{'type': type, 'id': id}]

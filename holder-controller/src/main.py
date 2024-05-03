@@ -51,7 +51,8 @@ def get_connections():
 
     results = []
     for conn in j["results"]:
-        results.append(conn["connection_id"])
+        result = f'id={conn["connection_id"]}, state={conn["state"]}'
+        results.append(result)
     
     return json.dumps(results)
 

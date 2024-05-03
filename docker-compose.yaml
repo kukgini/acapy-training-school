@@ -47,6 +47,8 @@ services:
       "--outbound-transport", "http",
       "--auto-respond-credential-request",
       "--auto-verify-presentation",
+      "--emit-new-didcomm-prefix",
+      "--preserve-exchange-records",
     ]
     depends_on:
       postgres:
