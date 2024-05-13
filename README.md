@@ -84,10 +84,12 @@ practice environment is ready now.
 curl http://localhost:8002/issue-credential/1
 curl http://localhost:8002/credentials
 curl http://localhost:8002/connections
+curl http://localhost:8002/issue-credential/records
+curl http://localhost:8002/present-proof/records
 
 # in issuer side, there is a credential exchange record with no connection.
 # this is because isser made a oob invitation without handshake_protocols.
-curl http://localhost:8003/credential-exchange/records
+curl http://localhost:8003/issue-credential/records
 curl http://localhost:8003/connections
 ```
 
@@ -100,10 +102,14 @@ curl http://localhost:8003/connections
 # presentation request is attached in that invitation.
 # holder build a proof of that request and send it to verifier.
 curl http://localhost:8002/present-proof/1
+curl http://localhost:8002/credentials
+curl http://localhost:8002/connections
+curl http://localhost:8002/issue-credential/records
+curl http://localhost:8002/present-proof/records
 
 # verifier has no connection because it was connection-less present proof
 # while verifier got a present-proof record.
-curl http://localhost:8004/proof-exchange/records
+curl http://localhost:8004/present-proof/records
 curl http://localhost:8004/connections
 ```
 

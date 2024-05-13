@@ -65,7 +65,7 @@ def get_credentials():
     credential_ids = []
     for credential in credentials:
         credential_ids.append(credential["referent"])
-    return json.dumps(credential_ids)
+    return json.dumps(credentials)
 
 @api.route('/issue-credential/1', methods=['GET'])
 def issue_credential_1():
@@ -77,6 +77,39 @@ def issue_credential_1():
 def present_proof_1():
     receive_invitation(get_oob_invitation_for_present_proof_from_verifier())
     return ('', 204)
+
+@api.route('/issue-credential/records', methods=['GET'])
+def get_issue_credential_records():
+    url = f'{acapy_admin_url}/issue-credential/records'
+    response = requests.get(url, headers=headers)
+    records = json.loads(response.text)
+
+    results = []
+    for record in records["results"]:
+        results.append(
+            f'credential_exchange_id={record.get("credential_exchange_id")} '
+            f'updated_at={record.get("updated_at")} '
+            f'state={record.get("state")} '
+            )
+
+    return json.dumps(results)
+
+@api.route('/present-proof/records', methods=['GET'])
+def get_present_proof_records():
+    url = f'{acapy_admin_url}/present-proof/records'
+    response = requests.get(url, headers=headers)
+    present_proof_records = json.loads(response.text)
+
+    results = []
+    for record in present_proof_records["results"]:
+        results.append(
+            f'presentation_exchange_id={record.get("presentation_exchange_id")} '
+            f'updated_at={record.get("updated_at")} '
+            f'state={record.get("state")} '
+            f'verified={record.get("verified")}'
+            )
+
+    return json.dumps(results)
 
 def get_oob_invitation_for_connection_from_issuer():
     url = f'{issuer_endpoint}/oob/invitation/connection'

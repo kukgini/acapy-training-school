@@ -130,6 +130,22 @@ def get_oob_invitation_for_issue_credential_1():
     result = json.dumps(create_oob_invitation('credential-offer', id))
     return result
 
+@api.route('/issue-credential/records', methods=['GET'])
+def get_issue_credential_records():
+    url = f'{acapy_admin_url}/issue-credential/records'
+    response = requests.get(url, headers=headers)
+    records = json.loads(response.text)
+
+    results = []
+    for record in records["results"]:
+        results.append(
+            f'credential_exchange_id={record.get("credential_exchange_id")} '
+            f'updated_at={record.get("updated_at")} '
+            f'state={record.get("state")} '
+            )
+
+    return json.dumps(results)
+
 @api.route('/all/clear', methods=['GET'])
 def all_clear():
     response = []
