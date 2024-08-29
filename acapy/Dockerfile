@@ -1,4 +1,4 @@
-FROM bcgovimages/aries-cloudagent:py3.9-indy-1.16.0_0.12.1
+FROM bcgovimages/aries-cloudagent:py3.12_1.0.0
 
 USER root
 WORKDIR /root
@@ -12,9 +12,9 @@ RUN apt-get -qq -y install --no-install-recommends \
                     patch
 
 COPY ./patches/aries-cloudagent-python.diff /root/patch.diff
-WORKDIR /home/indy/.local/lib/python3.9/site-packages
+WORKDIR /home/aries/.local/lib/python3.12/site-packages
 RUN patch -p1 < /root/patch.diff
 
-RUN echo 'indy ALL=NOPASSWD: ALL' >> /etc/sudoers
-USER indy
-WORKDIR /home/indy
+RUN echo 'aries ALL=NOPASSWD: ALL' >> /etc/sudoers
+USER aries
+WORKDIR /home/aries

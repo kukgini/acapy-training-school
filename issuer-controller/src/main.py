@@ -88,7 +88,7 @@ def create_oob_invitation(type, id):
     data = {
         'accept': ['didcomm/aip2'],
         'alias': 'Issuer',
-        'handshake_protocols': [],
+        'handshake_protocols': ['https://didcomm.org/didexchange/1.1'],
         'protocol_version': '1.1',
         'use_public_did': False,
     }
