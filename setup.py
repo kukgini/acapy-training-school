@@ -8,7 +8,7 @@ import dotenv
 
 logging.basicConfig(level = logging.DEBUG)
 
-acapy_admin_url="http://localhost:8001"
+acapy_admin_url="http://acapy:8001"
 
 def create_multitenancy_holder():
     url = f'{acapy_admin_url}/multitenancy/wallet'
@@ -212,35 +212,39 @@ if __name__ == '__main__':
         issuer_public_did_seed=os.environ['ISSUER_PUBLIC_DID_SEED']
         schema_version = os.environ["SCHEMA_VERSION"]
         
+        # SETUP issuer step 0, !!! MANUAL STEP !!!, register issuer DID as endorser role.
+        # register new DID into indy ledger with endorser role.
+        # you can use this UI http://test.bcovrin.vonx.io
+
+        # for the other indy-networks, you may need following roles.
+        # only steward can register a DID as endorser role.
+        # only trustee can register a DID as steward role.
+        
         # SETUP issuer step 1, create new DID 
         issuer_did = create_issuer_did(issuer_token, issuer_public_did_seed)
         os.environ["ISSUER_PUBLIC_DID"] = issuer_did
         dotenv.set_key(dotenv_file, "ISSUER_PUBLIC_DID", os.environ["ISSUER_PUBLIC_DID"])
 
-        # SETUP issuer step 2, !!! MANUAL STEP !!!, register issuer DID as endorser role.
-        # register new DID into indy ledger with endorser role using indy-cli.
-        # only steward can register a DID as endorser role.
-        # only trustee can register a DID as steward role.
+        # SETUP issuer step 2, !!!OPTIONAL!!! transaction author agreement
+        # some ledger requires to accept TAA before sending transactions. (e.g. Indicio)
+        # accept_taa(issuer_token)
 
-        # SETUP issuer step 3, transaction author agreement
-        accept_taa(issuer_token)
-
-        # SETUP issuer step 4, set created new DID as a public DID
+        # SETUP issuer step 3, set created new DID as a public DID
         issuer_did = os.environ["ISSUER_PUBLIC_DID"]
         assign_issuer_did_public(issuer_token, issuer_did)
 
-        # SETUP issuer step 5, create schema.
+        # SETUP issuer step 4, create schema.
         schema_id_1 = create_schema_1(issuer_token, issuer_did, schema_version)
         os.environ["SCHEMA_ID_1"] = schema_id_1
         dotenv.set_key(dotenv_file, "SCHEMA_ID_1", os.environ["SCHEMA_ID_1"])
 
-        # SETUP issuer step 6, create non revocable credential definition.
+        # SETUP issuer step 5, create non revocable credential definition.
         schema_id_1 = os.environ["SCHEMA_ID_1"]
         cred_def_1_non_revoc = create_credential_definition_non_revoc(issuer_token, issuer_did, schema_id_1)
         os.environ["CRED_DEF_ID_1_NON_REVOC"] = cred_def_1_non_revoc
         dotenv.set_key(dotenv_file, "CRED_DEF_ID_1_NON_REVOC", os.environ["CRED_DEF_ID_1_NON_REVOC"])
 
-        # SETUP issuer step 7, create revicable credential definition. (default issue type)
+        # SETUP issuer step 6, create revicable credential definition. (default issue type)
         cred_def_1_revocable1k = create_credential_definition_1_revocable_1k(issuer_token, issuer_did, schema_id_1)
         os.environ["CRED_DEF_ID_1_REVOCABLE_1K"] = cred_def_1_revocable1k
         dotenv.set_key(dotenv_file, "CRED_DEF_ID_1_REVOCABLE_1K", os.environ["CRED_DEF_ID_1_REVOCABLE_1K"])

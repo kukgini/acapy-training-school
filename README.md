@@ -1,10 +1,10 @@
-Although there is a demo project provided in aries-cloudagent-python, it was not easy for me to understand the relationship between the agent and agent controller for the actual service. Therefore, I made this practice environment for educational / excercise purposes. Hopefully, this repository will be helpful to beginners, especially in the context of multitenancy.
+The demo project in aries-cloudagent-python wasn't super helpful for me in understanding the relationship between the agent and the agent controller for the actual service. So, I put together this practice environment for my team and clients to use for educational and exercise purposes. Hopefully, this repository will be helpful to beginners, especially in the context of aca-py multitenancy.
 
 # setup guide
 
 ## register an endorser DID
 
-register an endorser DID with seed on test.bcovin.vonx.io and remember that seed.
+register an endorser DID with seed on https://test.bcovrin.vonx.io and remember that seed.
 
 ## setup environment variables
 
@@ -19,46 +19,35 @@ vi .env
 ```
 You need only two options to edit.
 * ISSUER_PUBLIC_DID_SEED='seed for a endorser that already registered above'
-* SCHEMA_VERSION='whatever you want in semver format'
+* SCHEMA_VERSION='whatever you want in semver format but not registered on ledger yet'
 
 # build docker images
 
 ```bash
-docker-compose build
+docker compose build
 ```
 
 # run base containers
 
 ```bash
-docker-compose up postgres tails acapy -d
+docker compose up -d
 ```
 
-# run setup.py
+# run setup
+
+Wait a few seconds for all containers is up
+```bash
+docker compose exec setup python3 setup.py
+```
+
+# re-run containers to apply environment veriables
 
 ```bash
-# this will setup 3 tenant (issuer / holder / verifier) in multi-tenancy acapy
-# and for the issuer, issuer public DID, schema and cred_def also setup. 
-
-# prepare python environment to run setup
-python3 -m venv venv
-source venv/bin/activate
-pip3 install requests python-dotenv
-
-# run setup. this will fill in remaining .env variables.
-python3 setup.py
-
-# clean up python environment
-deactivate
-rm -rf venv
+docker compose down
+docker compose up -d
 ```
 
-# run remain containers
-
-```bash
-docker-compose up -d
-```
-
-practice environment is ready now.
+environment is ready now.
 
 # how to use
 
