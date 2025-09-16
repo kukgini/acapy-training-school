@@ -17,7 +17,7 @@ def create_multitenancy_holder():
         "label": "Holder",
         "wallet_name": "Holder",
         "wallet_webhook_urls": [ "http://holder-controller/webhook" ],
-        "wallet_type": "askar-anoncreds",
+        "wallet_type": "askar",
         "wallet_dispatch_type": "default",
         "wallet_key_derivation": "RAW",
         "wallet_key": "BGiQz6MbFnw12D3UM8SPehtkoXLMj2BiDx85oxoUQ4L1",
@@ -38,7 +38,7 @@ def create_multitenancy_verifier():
         "label": "Varifier",
         "wallet_name": "Verifier",
         "wallet_webhook_urls": [ "http://verifier-controller/webhook" ],
-        "wallet_type": "askar-anoncreds",
+        "wallet_type": "askar",
         "wallet_dispatch_type": "default",
         "wallet_key_derivation": "RAW",
         "wallet_key": "BGiQz6MbFnw12D3UM8SPehtkoXLMj2BiDx85oxoUQ4L1",
@@ -59,7 +59,7 @@ def create_multitenancy_issuer():
         "label": "Issuer",
         "wallet_name": "Issuer",
         "wallet_webhook_urls": [ "http://issuer-controller/webhook" ],
-        "wallet_type": "askar-anoncreds",
+        "wallet_type": "askar",
         "wallet_dispatch_type": "default",
         "wallet_key_derivation": "RAW",
         "wallet_key": "BGiQz6MbFnw12D3UM8SPehtkoXLMj2BiDx85oxoUQ4L1",
@@ -127,70 +127,56 @@ def assign_issuer_did_public(issuer_token, did):
         raise Exception(f"Failed to assign public DID. {response.text}")
 
 def create_schema_1(issuer_token, issuer_did, schema_version):
-    url = f'{acapy_admin_url}/anoncreds/schema'
+    url = f'{acapy_admin_url}/schemas'
     headers = {
         'Authorization': f'Bearer {issuer_token}',
     }
     data = {
-        'schema': {
-            'attrNames': ['name','score','date','birthdate_dateint','timestamp'],
-            'issuerId': issuer_did,
-            'name': 'transcript',
-            'version': schema_version,
-        }
-        
+        'attributes': ['name','score','date','birthdate_dateint','timestamp'],
+        'schema_name': 'transcript',
+        'schema_version': schema_version,
     }
     response = requests.post(url, json=data, headers=headers)
     try:
         schema = response.json()
-        return schema["schema_state"]["schema_id"]
+        return schema["sent"]["schema_id"]
     except BaseException as err:
         raise Exception(f"Failed to create schema. {response.text}")
     
 
 def create_credential_definition_non_revoc(issuer_token, issuer_did, schema_id):
-    url = f'{acapy_admin_url}/anoncreds/credential-definition'
+    url = f'{acapy_admin_url}/credential-definitions'
     headers = {
         'Authorization': f'Bearer {issuer_token}',
     }
     data = {
-        'credential_definition': {
-            'issuerId': issuer_did,
-            'schemaId': schema_id,
-            'tag': 'non-revoc',
-        },
-        'options': {
-            'support_revocation': False,
-        }
+        'schema_id': schema_id,
+        'tag': 'non-revoc',
+        'support_revocation': False,
     }
     response = requests.post(url, json=data, headers=headers)
     try:
         j = response.json()
-        return j["credential_definition_state"]["credential_definition_id"]
+        return j["sent"]["credential_definition_id"]
     except BaseException as err:
         raise Exception(f"Failed to create credential definition. {response.text}")
     
 
 def create_credential_definition_1_revocable_1k(issuer_token, issuer_did, schema_id):
-    url = f'{acapy_admin_url}/anoncreds/credential-definition'
+    url = f'{acapy_admin_url}/credential-definitions'
     headers = {
         'Authorization': f'Bearer {issuer_token}',
     }
     data = {
-        'credential_definition': {
-            'issuerId': issuer_did,
-            'schemaId': schema_id,
-            'tag': 'revocable1k',
-        },
-        'options': {
-            'support_revocation': True,
-            'revocation_registry_size': 1000,
-        },
+        'schema_id': schema_id,
+        'tag': 'revocable1k',
+        'support_revocation': True,
+        'revocation_registry_size': 1000,
     }
     response = requests.post(url, json=data, headers=headers)
     try:
         j = response.json()
-        return j["credential_definition_state"]["credential_definition_id"]
+        return j["sent"]["credential_definition_id"]
     except BaseException as err:
         raise Exception(f"Failed to create credential definition. {response.text}")
     

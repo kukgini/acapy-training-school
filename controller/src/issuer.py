@@ -40,13 +40,13 @@ def webhook_handler(topic):
         logging.info(f'topic={topic}')
     return ('', 204)
 
-@api.route('/schemas/created', methods=['GET'])
+@api.route('/schemas', methods=['GET'])
 def get_schemas_created():
     url = f'{acapy_admin_url}/schemas/created'
     response = requests.get(url, headers=headers)
     return json.dumps(json.loads(response.text))
 
-@api.route('/credential-definitions/created', methods=['GET'])
+@api.route('/credential-definitions', methods=['GET'])
 def get_credential_definitions_created():
     url = f'{acapy_admin_url}/credential-definitions/created'
     response = requests.get(url, headers=headers)
@@ -64,7 +64,7 @@ def get_credential_definitions_write_record(id):
     response = requests.post(url, headers=headers)
     return json.dumps(json.loads(response.text))
 
-@api.route('/revocation-registries/created', methods=['GET'])
+@api.route('/revocation/registries', methods=['GET'])
 def get_revocation_registry_created():
     url = f'{acapy_admin_url}/revocation/registries/created'
     response = requests.get(url, headers=headers)
