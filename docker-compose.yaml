@@ -37,23 +37,7 @@ services:
       - 8001:8001
     volumes:
       - acapy-storage:/home/indy/.indy_client
-    entrypoint: [ 
-      "aca-py", "start", 
-      "--admin", "0.0.0.0", "8001",
-      "--endpoint", "http://acapy:8000",
-      "--inbound-transport", "http", "0.0.0.0", "8000",
-      "--outbound-transport", "http",
-      "--tails-server-base-url", "http://tails:8080",
-      "--tails-server-upload-url", "http://tails:8080",
-      "--auto-accept-requests",
-      "--auto-respond-credential-offer",
-      "--auto-respond-credential-request",
-      "--auto-store-credential",
-      "--auto-respond-presentation-request",
-      "--auto-verify-presentation",
-      "--emit-new-didcomm-prefix",
-      "--preserve-exchange-records",
-    ]
+    entrypoint: ["aca-py", "start"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,6 +51,36 @@ services:
       RUST_LOG: "debug"
       ACAPY_LOG_LEVEL: "debug"
       
+      # Admin API configuration
+      ACAPY_ADMIN: "0.0.0.0 8001"
+      ACAPY_ADMIN_INSECURE_MODE: "true"
+      ACAPY_IMAGE_URL: "https://robohash.org/acapy"
+      ACAPY_ADMIN_CLIENT_MAX_REQUEST_SIZE: "16"
+      
+      # Endpoint configuration
+      ACAPY_ENDPOINT: "http://acapy:8000"
+      
+      # Transport configuration
+      ACAPY_INBOUND_TRANSPORT: "http 0.0.0.0 8000"
+      ACAPY_OUTBOUND_TRANSPORT: "http"
+      
+      # Tails server configuration
+      ACAPY_TAILS_SERVER_BASE_URL: "http://tails:8080"
+      ACAPY_TAILS_SERVER_UPLOAD_URL: "http://tails:8080"
+      
+      # Auto-response configuration
+      ACAPY_AUTO_ACCEPT_REQUESTS: "true"
+      ACAPY_AUTO_RESPOND_CREDENTIAL_OFFER: "true"
+      ACAPY_AUTO_RESPOND_CREDENTIAL_REQUEST: "true"
+      ACAPY_AUTO_STORE_CREDENTIAL: "true"
+      ACAPY_AUTO_RESPOND_PRESENTATION_REQUEST: "true"
+      ACAPY_AUTO_VERIFY_PRESENTATION: "true"
+      
+      # Protocol configuration
+      ACAPY_EMIT_NEW_DIDCOMM_PREFIX: "true"
+      ACAPY_PRESERVE_EXCHANGE_RECORDS: "true"
+      
+      # Multitenancy configuration
       ACAPY_MULTITENANT: "true"
       ACAPY_MULTITENANT_ADMIN: "true"
       ACAPY_MULTITENANT_JWT_SECRET: "EKLKNBj4JasyVTuEWdyYjFis8ELBquuEErSHSB4DNWm2"
@@ -78,6 +92,7 @@ services:
             "key_derivation_method":"RAW"
           }
           
+      # Wallet configuration
       ACAPY_WALLET_ALLOW_INSECURE_SEED: "true"
       ACAPY_WALLET_TYPE: "askar"
       ACAPY_WALLET_NAME: "base_wallet"
@@ -100,9 +115,7 @@ services:
           "admin_password":"mysecretpassword"
         }
 
-      ACAPY_ADMIN_INSECURE_MODE: "true"
-      ACAPY_IMAGE_URL: "https://robohash.org/acapy"
-      ACAPY_ADMIN_CLIENT_MAX_REQUEST_SIZE: "16"
+      # General configuration
       ACAPY_MAX_MESSAGE_SIZE: "16777216"
       ACAPY_MAX_OUTBOUND_RETRY: 1
       ACAPY_AUTO_PROVISION: "true"
