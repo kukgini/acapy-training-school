@@ -88,7 +88,8 @@ def create_oob_invitation(type, id):
     data = {
         'accept': ['didcomm/aip2'],
         'alias': 'Issuer',
-        'handshake_protocols': ['https://didcomm.org/didexchange/1.1'],
+        # 'handshake_protocols': ['https://didcomm.org/didexchange/1.1'],
+        'handshake_protocols': [],
         'protocol_version': '1.1',
         'use_public_did': False,
     }
@@ -127,7 +128,7 @@ def get_oob_invitation_for_issue_credential_1():
     response = requests.post(url, json=data, headers=headers)
     offer = json.loads(response.text)
     id = offer['credential_exchange_id']
-    result = json.dumps(create_oob_invitation('credential-offer', id))
+    result = json.dumps(create_oob_invitation('credential-offer', id), indent=2)
     return result
 
 @api.route('/issue-credential/records', methods=['GET'])

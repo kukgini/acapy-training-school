@@ -54,7 +54,7 @@ def get_connections():
         result = f'id={conn["connection_id"]}, state={conn["state"]}'
         results.append(result)
     
-    return json.dumps(results)
+    return json.dumps(results, indent=2)
 
 @api.route('/credentials', methods=['GET'])
 def get_credentials():
@@ -65,7 +65,7 @@ def get_credentials():
     credential_ids = []
     for credential in credentials:
         credential_ids.append(credential["referent"])
-    return json.dumps(credentials)
+    return json.dumps(credentials, indent=2)
 
 @api.route('/issue-credential/1', methods=['GET'])
 def issue_credential_1():
@@ -92,7 +92,7 @@ def get_issue_credential_records():
             f'state={record.get("state")} '
             )
 
-    return json.dumps(results)
+    return json.dumps(results, indent=2)
 
 @api.route('/present-proof/records', methods=['GET'])
 def get_present_proof_records():
