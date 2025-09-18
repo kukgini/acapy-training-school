@@ -1,15 +1,19 @@
 FROM ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.3-lts
 
+# Install required packages and configure sudo access
 USER root
-WORKDIR /root
+RUN apt-get update -y && \
+    apt-get install -y sudo patch postgresql-client && \
+    echo 'aries ALL=NOPASSWD: ALL' >> /etc/sudoers && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -y
-RUN apt-get install -y sudo patch postgresql-client
-
-COPY ./patch.diff /root/patch.diff
-WORKDIR /home/aries/.local/lib/python3.12/site-packages
-RUN patch -p1 < /root/patch.diff
-
-RUN echo 'aries ALL=NOPASSWD: ALL' >> /etc/sudoers
+# Switch to aries user and apply patch
 USER aries
+WORKDIR /home/aries/.local/lib/python3.12/site-packages
+COPY ./patch.diff ./
+RUN patch -p1 < patch.diff
+
+# Copy ngrok wait script to home directory
 WORKDIR /home/aries
+COPY ./ngrok-wait.sh ./
