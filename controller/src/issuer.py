@@ -91,6 +91,7 @@ def create_oob_invitation(type, id):
         # 'handshake_protocols': ['https://didcomm.org/didexchange/1.1'],
         'handshake_protocols': [],
         'protocol_version': '1.1',
+        'use_did_method': 'did:peer:4',
         'use_public_did': False,
     }
     if id:
