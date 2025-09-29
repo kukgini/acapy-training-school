@@ -26,7 +26,14 @@ services:
     volumes:
       - ./etc/indy:/etc/indy
     entrypoint: [
-      "indy-vdr-proxy", "--no-refresh", "--refresh-interval", "0", "--port", "7000", "--genesis", "/etc/indy/pool_transactions_genesis"
+      "indy-vdr-proxy", 
+      "--no-refresh", 
+      "--refresh-interval", "0", 
+      "--port", "7000", 
+      "--genesis", "/etc/indy/pool_transactions_genesis",
+      "--use-cache",
+      "--cache-size", "1000",
+      "--cache-path", "/tmp/cache"
     ]
   tails:
     build:

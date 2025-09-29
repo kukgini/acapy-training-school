@@ -91,7 +91,7 @@ def create_oob_invitation(type, id):
         # 'handshake_protocols': ['https://didcomm.org/didexchange/1.1'],
         'handshake_protocols': [],
         'protocol_version': '1.1',
-        'use_did_method': 'did:peer:4',
+        # 'use_did_method': 'did:peer:4',
         'use_public_did': False,
     }
     if id:
@@ -108,8 +108,8 @@ def create_oob_invitation(type, id):
 def get_oob_invitation_for_connection():
     return json.dumps(create_oob_invitation(None, None))
 
-@api.route('/credential-offer/transcript', methods=['GET'])
-def get_oob_invitation_for_issue_credential_1():
+@api.route('/issue-credential/credential-offer/transcript', methods=['GET'])
+def get_oob_invitation_for_transcript_credential_offer():
     url = f'{acapy_admin_url}/issue-credential/create-offer'
     data = {
         'auto_issue': True,
@@ -122,7 +122,7 @@ def get_oob_invitation_for_issue_credential_1():
                 {'name': 'score', 'value': '87'},
                 {'name': 'birthdate_dateint', 'value': '19850101'},
                 {'name': 'date', 'value': '20230101'},
-                {'name': 'timestamp', 'value': '12:01:01'},
+                {'name': 'timestamp', 'value': '120101'},
             ]
         }
     }

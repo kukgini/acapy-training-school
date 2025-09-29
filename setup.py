@@ -234,7 +234,7 @@ if __name__ == '__main__':
         cred_def_1_revocable1k = create_credential_definition_1_revocable_1k(issuer_token, issuer_did, schema_id_1)
         os.environ["CRED_DEF_ID_1_REVOCABLE_1K"] = cred_def_1_revocable1k
         dotenv.set_key(dotenv_file, "CRED_DEF_ID_1_REVOCABLE_1K", os.environ["CRED_DEF_ID_1_REVOCABLE_1K"])
-        dotenv.set_key(dotenv_file, "CRED_DEF_ID_1", os.environ["CRED_DEF_ID_1_REVOCABLE_1K"])
+        dotenv.set_key(dotenv_file, "CRED_DEF_ID_1", os.environ["CRED_DEF_ID_1_NON_REVOC"])
 
     except Exception as err:
         logging.error(f"Oops! setup failed. {err=}")

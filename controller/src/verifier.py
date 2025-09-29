@@ -40,7 +40,7 @@ def webhook_handler(topic):
         logging.info(f'topic={topic}')
     return ('', 204)
 
-@api.route('/connections', methods=['GET'])
+@api.route('/record/connection', methods=['GET'])
 def get_connections():
     url = f'{acapy_admin_url}/connections'
     response = requests.get(url, headers=headers)
@@ -53,7 +53,7 @@ def get_connections():
     
     return json.dumps(results)
 
-@api.route('/present-proof/records', methods=['GET'])
+@api.route('/record/proof', methods=['GET'])
 def get_present_proof_records():
     url = f'{acapy_admin_url}/present-proof/records'
     response = requests.get(url, headers=headers)
@@ -90,8 +90,8 @@ def get_nonce():
     characters = '123456789'
     return ''.join(random.choice(characters) for i in range(length))
 
-@api.route('/oob/invitation/present-proof/1', methods=['GET'])
-def get_oob_invitation_for_present_proof_1():
+@api.route('/proof/request/transcript', methods=['GET'])
+def get_transcript_proof_request():
     url = f'{acapy_admin_url}/present-proof/create-request'
     data = {
         'auto_verify': True,
@@ -117,7 +117,6 @@ def get_oob_invitation_for_present_proof_1():
                 },
             },
         },
-
     }
     response = requests.post(url, json=data, headers=headers)
     offer = json.loads(response.text)
@@ -125,7 +124,7 @@ def get_oob_invitation_for_present_proof_1():
     result = json.dumps(create_oob_invitation('Verifier', 'present-proof', id))
     return result
 
-@api.route('/all/clear', methods=['GET'])
+@api.route('/cleanup', methods=['GET'])
 def all_clear():
     response = []
 
