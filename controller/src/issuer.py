@@ -108,7 +108,7 @@ def create_oob_invitation(type, id):
 def get_oob_invitation_for_connection():
     return json.dumps(create_oob_invitation(None, None))
 
-@api.route('/oob/invitation/issue-credential/1', methods=['GET'])
+@api.route('/credential-offer/transcript', methods=['GET'])
 def get_oob_invitation_for_issue_credential_1():
     url = f'{acapy_admin_url}/issue-credential/create-offer'
     data = {

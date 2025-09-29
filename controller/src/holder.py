@@ -67,7 +67,7 @@ def get_credentials():
         credential_ids.append(credential["referent"])
     return json.dumps(credentials, indent=2)
 
-@api.route('/issue-credential/1', methods=['GET'])
+@api.route('/issue-credential/transcript', methods=['GET'])
 def issue_credential_1():
     # receive_invitation(get_oob_invitation_for_connection_from_issuer())
     receive_invitation(get_oob_invitation_for_issue_credential_from_issuer())
@@ -119,10 +119,11 @@ def get_oob_invitation_for_connection_from_issuer():
     return invitation
 
 def get_oob_invitation_for_issue_credential_from_issuer():
-    url = f'{issuer_endpoint}/oob/invitation/issue-credential/1'
+    url = f'{issuer_endpoint}/credential-offer/transcript'
     response = requests.get(url,  headers=headers)
     oob = json.loads(response.text)
     invitation = oob['invitation']
+    logging.info(f'invitation={invitation}')
     return invitation
 
 def get_oob_invitation_for_present_proof_from_verifier():
@@ -130,6 +131,7 @@ def get_oob_invitation_for_present_proof_from_verifier():
     response = requests.get(url,  headers=headers)
     oob = json.loads(response.text)
     invitation = oob['invitation']
+    logging.info(f'invitation={invitation}')
     return invitation
 
 def receive_invitation(invitation):

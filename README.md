@@ -83,7 +83,7 @@ In a typical scenario, the holder would receive an out-of-band invitation throug
 The following API call will receive and accept an out-of-band invitation from the issuer. The invitation includes an attached credential offer, and during processing, the holder automatically receives the credential. This is a connection-less exchange, so no persistent connection is established.
 
 ```bash
-curl http://localhost:8002/issue-credential/1
+curl http://localhost:8002/issue-credential/transcript
 ```
 
 ### Verify Issuance Status
