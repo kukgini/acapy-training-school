@@ -13,7 +13,3 @@ USER aries
 WORKDIR /home/aries/.local/lib/python3.12/site-packages
 COPY ./patch.diff ./
 RUN patch -p1 < patch.diff
-
-# Copy ngrok wait script to home directory
-WORKDIR /home/aries
-COPY ./ngrok-wait.sh ./
