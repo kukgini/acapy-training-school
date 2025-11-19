@@ -24,10 +24,10 @@ def webhook_handler(topic):
         state = payload["state"]
         logging.info(f'topic={topic}, id={id}, state={state}')
     if topic == 'connection_reuse_accepted':
-        logging.info(f'topic={topic}, payload={json.dumps(payload)}')
+        logging.info(f'topic={topic}, payload={json.dumps(payload, indent=2)}')
     elif topic == 'out_of_band':
         state = payload["state"]
-        logging.info(f'topic={topic}, state={state}, payload={json.dumps(payload)}')
+        logging.info(f'topic={topic}, state={state}, payload={json.dumps(payload, indent=2)}')
     elif topic == 'issue_credential':
         id = payload['credential_exchange_id']
         state = payload["state"]
@@ -44,31 +44,31 @@ def webhook_handler(topic):
 def get_schemas_created():
     url = f'{acapy_admin_url}/schemas/created'
     response = requests.get(url, headers=headers)
-    return json.dumps(json.loads(response.text))
+    return json.dumps(json.loads(response.text), indent=2)
 
 @api.route('/credential-definitions', methods=['GET'])
 def get_credential_definitions_created():
     url = f'{acapy_admin_url}/credential-definitions/created'
     response = requests.get(url, headers=headers)
-    return json.dumps(json.loads(response.text))
+    return json.dumps(json.loads(response.text), indent=2)
 
 @api.route('/credential-definitions/<id>', methods=['GET'])
 def get_credential_definitions(id):
     url = f'{acapy_admin_url}/credential-definitions/{id}'
     response = requests.get(url, headers=headers)
-    return json.dumps(json.loads(response.text))
+    return json.dumps(json.loads(response.text), indent=2)
 
 @api.route('/credential-definitions/<id>/write_record', methods=['GET'])
 def get_credential_definitions_write_record(id):
     url = f'{acapy_admin_url}/credential-definitions/{id}/write_record'
     response = requests.post(url, headers=headers)
-    return json.dumps(json.loads(response.text))
+    return json.dumps(json.loads(response.text), indent=2)
 
 @api.route('/revocation/registries', methods=['GET'])
 def get_revocation_registry_created():
     url = f'{acapy_admin_url}/revocation/registries/created'
     response = requests.get(url, headers=headers)
-    return json.dumps(json.loads(response.text))
+    return json.dumps(json.loads(response.text), indent=2)
 
 @api.route('/connections', methods=['GET'])
 def get_connections():
@@ -82,7 +82,7 @@ def get_connections():
         results.append(result)
 
     
-    return json.dumps(results)
+    return json.dumps(results, indent=2)
 
 def create_oob_invitation(type, id):    
     data = {
@@ -142,7 +142,7 @@ def get_issue_credential_records():
             f'state={record.get("state")} '
             )
 
-    return json.dumps(results)
+    return json.dumps(results, indent=2)
 
 @api.route('/cleanup', methods=['GET'])
 def all_clear():
@@ -172,7 +172,7 @@ def all_clear():
         requests.delete(f'{acapy_admin_url}/connections/{connection_id}', headers=headers)
         response.append(f'connection_id={connection_id}')
 
-    return json.dumps(response)
+    return json.dumps(response, indent=2)
    
 if __name__ == '__main__':
     api.run(port=80, host='0.0.0.0')

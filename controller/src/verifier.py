@@ -24,10 +24,10 @@ def webhook_handler(topic):
         state = payload["state"]
         logging.info(f'topic={topic}, id={id}, state={state}')
     if topic == 'connection_reuse_accepted':
-        logging.info(f'topic={topic}, payload={json.dumps(payload)}')
+        logging.info(f'topic={topic}, payload={json.dumps(payload, indent=2)}')
     elif topic == 'out_of_band':
         state = payload["state"]
-        logging.info(f'topic={topic}, state={state}, payload={json.dumps(payload)}')
+        logging.info(f'topic={topic}, state={state}, payload={json.dumps(payload, indent=2)}')
     elif topic == 'issue_credential':
         id = payload['credential_exchange_id']
         state = payload["state"]
@@ -51,7 +51,7 @@ def get_connections():
         result = f'id={conn["connection_id"]}, state={conn["state"]}'
         results.append(result)
     
-    return json.dumps(results)
+    return json.dumps(results, indent=2)
 
 @api.route('/present-proof/records', methods=['GET'])
 def get_present_proof_records():
@@ -68,7 +68,7 @@ def get_present_proof_records():
             f'verified={record.get("verified")}'
             )
 
-    return json.dumps(results)
+    return json.dumps(results, indent=2)
 
 def create_oob_invitation(alias, type, id):    
     url = f'{acapy_admin_url}/out-of-band/create-invitation?auto_accept=true'
@@ -121,7 +121,7 @@ def get_transcript_proof_request():
     response = requests.post(url, json=data, headers=headers)
     offer = json.loads(response.text)
     id = offer['presentation_exchange_id']
-    result = json.dumps(create_oob_invitation('Verifier', 'present-proof', id))
+    result = json.dumps(create_oob_invitation('Verifier', 'present-proof', id), indent=2)
     return result
 
 @api.route('/cleanup', methods=['GET'])
@@ -152,7 +152,7 @@ def all_clear():
         requests.delete(f'{acapy_admin_url}/connections/{connection_id}', headers=headers)
         response.append(f'connection_id={connection_id}')
 
-    return json.dumps(response)
+    return json.dumps(response, indent=2)
 
 if __name__ == '__main__':
     api.run(port=80, host='0.0.0.0')
