@@ -104,10 +104,6 @@ def create_oob_invitation(type, id):
     response = requests.post(url, json=data, headers=headers)
     return json.loads(response.text)
 
-@api.route('/oob/invitation/connection', methods=['GET'])
-def get_oob_invitation_for_connection():
-    return json.dumps(create_oob_invitation(None, None))
-
 @api.route('/issue-credential/credential-offer/transcript', methods=['GET'])
 def get_oob_invitation_for_transcript_credential_offer():
     url = f'{acapy_admin_url}/issue-credential/create-offer'
@@ -148,7 +144,7 @@ def get_issue_credential_records():
 
     return json.dumps(results)
 
-@api.route('/all/clear', methods=['GET'])
+@api.route('/cleanup', methods=['GET'])
 def all_clear():
     response = []
 

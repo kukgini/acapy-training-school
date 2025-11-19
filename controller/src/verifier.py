@@ -40,7 +40,7 @@ def webhook_handler(topic):
         logging.info(f'topic={topic}')
     return ('', 204)
 
-@api.route('/record/connection', methods=['GET'])
+@api.route('/connections', methods=['GET'])
 def get_connections():
     url = f'{acapy_admin_url}/connections'
     response = requests.get(url, headers=headers)
@@ -53,7 +53,7 @@ def get_connections():
     
     return json.dumps(results)
 
-@api.route('/record/proof', methods=['GET'])
+@api.route('/present-proof/records', methods=['GET'])
 def get_present_proof_records():
     url = f'{acapy_admin_url}/present-proof/records'
     response = requests.get(url, headers=headers)
@@ -90,7 +90,7 @@ def get_nonce():
     characters = '123456789'
     return ''.join(random.choice(characters) for i in range(length))
 
-@api.route('/proof/request/transcript', methods=['GET'])
+@api.route('/present-proof/create-request/transcript', methods=['GET'])
 def get_transcript_proof_request():
     url = f'{acapy_admin_url}/present-proof/create-request'
     data = {

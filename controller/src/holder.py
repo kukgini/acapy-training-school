@@ -73,7 +73,7 @@ def issue_credential_1():
     receive_invitation(get_oob_invitation_for_issue_credential_from_issuer())
     return ('', 204)
 
-@api.route('/present-proof/1', methods=['GET'])
+@api.route('/present-proof/transcript', methods=['GET'])
 def present_proof_1():
     receive_invitation(get_oob_invitation_for_present_proof_from_verifier())
     return ('', 204)
@@ -111,15 +111,8 @@ def get_present_proof_records():
 
     return json.dumps(results)
 
-def get_oob_invitation_for_connection_from_issuer():
-    url = f'{issuer_endpoint}/oob/invitation/connection'
-    response = requests.get(url,  headers=headers)
-    oob = json.loads(response.text)
-    invitation = oob['invitation']
-    return invitation
-
 def get_oob_invitation_for_issue_credential_from_issuer():
-    url = f'{issuer_endpoint}/credential-offer/transcript'
+    url = f'{issuer_endpoint}/issue-credential/credential-offer/transcript'
     response = requests.get(url,  headers=headers)
     oob = json.loads(response.text)
     invitation = oob['invitation']
@@ -127,7 +120,7 @@ def get_oob_invitation_for_issue_credential_from_issuer():
     return invitation
 
 def get_oob_invitation_for_present_proof_from_verifier():
-    url = f'{verifier_endpoint}/oob/invitation/present-proof/1'
+    url = f'{verifier_endpoint}/present-proof/create-request/transcript'
     response = requests.get(url,  headers=headers)
     oob = json.loads(response.text)
     invitation = oob['invitation']
@@ -139,7 +132,7 @@ def receive_invitation(invitation):
     response = requests.post(url, json=invitation, headers=headers)
     return json.dumps(response.text)
 
-@api.route('/all/clear', methods=['GET'])
+@api.route('/cleanup', methods=['GET'])
 def all_clear():
     response = []
 
