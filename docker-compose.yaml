@@ -1,0 +1,186 @@
+volumes:
+  postgres-data:
+  acapy-storage:
+  tails-files:
+
+services:
+  postgres:
+    image: postgres:14
+    platform: linux/amd64
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  indy-vdr-proxy:
+    build:
+      context: ./indy-vdr-proxy
+    platform: linux/amd64
+    ports:
+      - 7000:7000
+    volumes:
+      - ./etc/indy:/etc/indy
+    entrypoint: [
+      "indy-vdr-proxy", 
+      "--no-refresh", 
+      "--refresh-interval", "0", 
+      "--port", "7000", 
+      "--genesis", "/etc/indy/pool_transactions_genesis",
+      "--use-cache",
+      "--cache-size", "1000",
+      "--cache-path", "/tmp/cache"
+    ]
+  tails:
+    build:
+      context: ./tails
+    platform: linux/amd64
+    ports:
+      - 7001:7001
+    volumes:
+      - tails-files:/var/lib/tails-server
+    entrypoint: [
+      "tails-server", "--host", "0.0.0.0", "--port", "7001", "--storage-path", "/var/lib/tails-server"
+    ]
+  acapy:
+    build:
+      context: ./acapy-1.3-lts
+    platform: linux/amd64
+    ports:
+      - 8000:8000
+      - 8001:8001
+    volumes:
+      - acapy-storage:/home/indy/.indy_client
+      - ./etc/indy:/etc/indy
+    entrypoint: [ 
+      "aca-py", "start", 
+      "--admin", "0.0.0.0", "8001",
+      "--endpoint", "http://acapy:8000",
+      "--inbound-transport", "http", "0.0.0.0", "8000",
+      "--outbound-transport", "http",
+      "--tails-server-base-url", "http://tails:7001",
+      "--tails-server-upload-url", "http://tails:7001",
+      "--auto-accept-requests",
+      "--auto-respond-credential-offer",
+      "--auto-respond-credential-request",
+      "--auto-store-credential",
+      "--auto-respond-presentation-request",
+      "--auto-verify-presentation",
+      "--emit-new-didcomm-prefix",
+      "--preserve-exchange-records",
+    ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://acapy:8001/status/ready"]
+        interval: 1m
+        timeout: 10s
+        retries: 3
+        start_period: 10s
+    environment:
+      RUST_LOG: "debug"
+      ACAPY_LOG_LEVEL: "debug"
+      
+      ACAPY_MULTITENANT: "true"
+      ACAPY_MULTITENANT_ADMIN: "true"
+      ACAPY_MULTITENANT_JWT_SECRET: "EKLKNBj4JasyVTuEWdyYjFis8ELBquuEErSHSB4DNWm2"
+      ACAPY_MULTITENANCY_CONFIGURATION: |+
+          {
+            "wallet_type":"single-wallet-askar",
+            "wallet_name":"tenancy_wallets",
+            "cache_size":"100",
+            "key_derivation_method":"kdf:argon2i:mod"
+          }
+          
+      ACAPY_WALLET_ALLOW_INSECURE_SEED: "true"
+      ACAPY_WALLET_TYPE: "askar"
+      ACAPY_WALLET_NAME: "base_wallet"
+      
+      ACAPY_WALLET_KEY: "4iXo4Gy6ihZtR8WwM9nxegXZj4tghHGQBh6g62jqCV9R"
+      ACAPY_WALLET_KEY_DERIVATION_METHOD: "kdf:argon2i:mod"
+
+      ACAPY_WALLET_STORAGE_TYPE: "postgres_storage"
+      ACAPY_WALLET_STORAGE_CONFIG: |+
+          {
+            "url":"postgres:5432",
+            "max_connections":"5",
+            "min_idle_count":"0",
+            "connection_timeout":"5",
+            "wallet_scheme":"DatabasePerWallet"
+          }
+      ACAPY_WALLET_STORAGE_CREDS: |+
+        {
+          "account":"postgres",
+          "password":"mysecretpassword",
+          "admin_account":"postgres",
+          "admin_password":"mysecretpassword"
+        }
+
+      ACAPY_ADMIN_INSECURE_MODE: "true"
+      ACAPY_IMAGE_URL: "https://robohash.org/acapy"
+      ACAPY_ADMIN_CLIENT_MAX_REQUEST_SIZE: "16"
+      ACAPY_MAX_MESSAGE_SIZE: "16777216"
+      ACAPY_MAX_OUTBOUND_RETRY: 1
+      ACAPY_AUTO_PROVISION: "true"
+      ACAPY_GENESIS_FILE: "/etc/indy/pool_transactions_genesis"
+
+  holder:
+    build:
+      context: ./controller
+    platform: linux/amd64
+    ports:
+      - 8002:80
+    volumes:
+      - ./controller/src:/app/src
+    entrypoint: [
+       "python3", "src/holder.py"
+    ]
+    environment:
+      ACAPY_WALLET_TOKEN: "${HOLDER_WALLET_TOKEN}"
+      ACAPY_ADMIN_URL: "http://acapy:8001"
+      ISSUER_ENDPOINT: "http://issuer:80"
+      VERIFIER_ENDPOINT: "http://verifier:80"
+  issuer:
+    build:
+      context: ./controller
+    platform: linux/amd64
+    ports:
+      - 8003:80
+    volumes:
+      - ./controller/src:/app/src
+    entrypoint: [
+       "python3", "src/issuer.py"
+    ]
+    environment:
+      ACAPY_WALLET_TOKEN: "${ISSUER_WALLET_TOKEN}"
+      ACAPY_ADMIN_URL: "http://acapy:8001"
+      CRED_DEF_ID_1: "${CRED_DEF_ID_1}"
+  verifier:
+    build:
+      context: ./controller
+    platform: linux/amd64
+    ports:
+      - 8004:80
+    volumes:
+      - ./controller/src:/app/src
+    entrypoint: [
+       "python3", "src/verifier.py"
+    ]
+    environment:
+      ACAPY_WALLET_TOKEN: "${VERIFIER_WALLET_TOKEN}"
+      ACAPY_ADMIN_URL: "http://acapy:8001"
+      CRED_DEF_ID_1: "${CRED_DEF_ID_1}"
+  setup:
+    build:
+      context: ./setup
+    platform: linux/amd64
+    volumes:
+      - ./:/setup/
+    entrypoint: [
+      "bash", "-c", "while true; do sleep 10000; done"
+    ]

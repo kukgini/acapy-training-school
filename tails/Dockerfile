@@ -1,0 +1,1 @@
+FROM  ghcr.io/bcgov/tails-server:1.2.1
