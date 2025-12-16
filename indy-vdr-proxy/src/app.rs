@@ -16,6 +16,7 @@ pub struct Config {
     pub cache: bool,
     pub cache_size: usize,
     pub cache_path: Option<String>,
+    pub cache_ttl: u64,
 }
 
 pub fn load_config() -> Result<Config, String> {
@@ -99,6 +100,11 @@ pub fn load_config() -> Result<Config, String> {
                 .long("cache-path")
                 .value_name("CACHE_PATH")
                 .help("Path to cache")
+        ).arg(
+            Arg::new("cache-ttl")
+                .long("cache-ttl")
+                .value_name("CACHE_TTL")
+                .help("Cache TTL in seconds (default: 86400 = 24 hours)")
         );
 
     #[cfg(unix)]
@@ -164,6 +170,11 @@ pub fn load_config() -> Result<Config, String> {
         .transpose()?
         .unwrap_or(1000);
     let cache_path = matches.get_one::<String>("cache-path").cloned();
+    let cache_ttl = matches
+        .get_one::<String>("cache-ttl")
+        .map(|ival| ival.parse::<u64>().map_err(|_| "Invalid cache TTL"))
+        .transpose()?
+        .unwrap_or(86400);
 
     Ok(Config {
         genesis,
@@ -180,5 +191,6 @@ pub fn load_config() -> Result<Config, String> {
         cache,
         cache_size,
         cache_path,
+        cache_ttl,
     })
 }

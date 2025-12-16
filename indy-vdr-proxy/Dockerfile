@@ -1,4 +1,4 @@
-FROM rust:1.82-slim AS builder
+FROM rust:1.85-slim AS builder
 
 USER root
 WORKDIR /root
@@ -18,7 +18,7 @@ RUN apt-get update -y && \
 COPY  . .
 RUN cargo build --release
 
-FROM rust:1.82-slim
+FROM rust:1.85-slim
 
 RUN mkdir -p /etc/indy
 

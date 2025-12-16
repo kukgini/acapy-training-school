@@ -20,7 +20,7 @@ clap = "~4.2"
 env_logger = "0.10"
 futures-executor = "0.3"
 futures-util = "0.3"
-indy-vdr = { git = "https://github.com/hyperledger/indy-vdr", branch="main", default-features = false, features = [
+indy-vdr = { git = "https://github.com/hyperledger/indy-vdr", tag = "v0.4.4", default-features = false, features = [
     "log",
 ] }
 git2 = "0.18"
