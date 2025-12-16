@@ -433,7 +433,7 @@ where
             Some(path) => {
                 let storage = OrderedHashMap::new(
                     new_fs_ordered_store(path.clone())
-                        .expect(format!("Error creating cache at {}", path).as_str()),
+                        .map_err(|e| format!("Error creating cache at {}: {:?}", path, e))?,
                 );
                 Some(storage)
             }
@@ -441,7 +441,7 @@ where
         };
         let strategy = CacheStrategyTTL::new(
             config.cache_size,
-            Duration::from_secs(86400).as_millis(),
+            Duration::from_secs(config.cache_ttl).as_millis(),
             storage_type,
             None,
         );

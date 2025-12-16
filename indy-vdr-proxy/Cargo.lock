@@ -928,7 +928,7 @@ dependencies = [
 [[package]]
 name = "indy-vdr"
 version = "0.4.4"
-source = "git+https://github.com/hyperledger/indy-vdr?branch=main#203c29e2127274de99b7b70b4c521e089624721d"
+source = "git+https://github.com/hyperledger/indy-vdr?tag=v0.4.4#b792bfed89ac2d78b4f1489d975774034f2e0988"
 dependencies = [
  "base64 0.22.1",
  "bs58",
